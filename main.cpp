@@ -1,4 +1,4 @@
-#include <string>
+//#include <string>
 #include<iostream>
 
 #include "Parent.h"
@@ -8,14 +8,13 @@ int main(int argc, char* argv[])
 {
     try {
         if (argc <= 1) {
-            Parent tmp;
+            Parent mainBody;
         }
         else {
-            //std::cout << "Incorrect inp" << std::endl;
 #ifdef __linux__
-            Pharmacy request(argv[0],argv[1]);
+            Child request(argv[0], argv[1]);
 #elif   _WIN32 | _WIN64
-			Child request(argv);
+			Child request(argv[1]);
 #endif
         }
     }

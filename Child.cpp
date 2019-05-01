@@ -1,20 +1,52 @@
+#ifdef _WIN32
 #include <Windows.h>
 #include <conio.h>
 #include <time.h>
+
+#elif __linux__
+#include <unistd.h>
+#include <signal.h>
+#include <ncurses.h>
+#include <cstring>
+#endif
+
 #include "Child.h"
 #define ever ;;
 
+#ifdef __linux__
+bool Print = false;
+bool Close = false;
+#endif
+
 Child::Child() {};
 
-Child::Child(char* argv[])
+Child::Child(char* argv, char* nonUse)
+{
+	run(argv);
+}
+
+Child::Child(char* argv)
 {
 	run(argv);
 }
 
 Child::~Child() {};
 
-void Child::run(char* argv[]) 
+#ifdef __linux__
+void exitProcess(int signal)
 {
+	Close = true;
+}
+
+void printLine(int signal)
+{
+	Print = true;
+}
+#endif
+
+void Child::run(char* argv) 
+{
+	#ifdef _WIN32
 	char bufID[10];
 
 	sprintf_s(bufID, "%dprint", atoi(argv[1]));
@@ -27,10 +59,26 @@ void Child::run(char* argv[])
 	HANDLE stop = OpenEvent(EVENT_ALL_ACCESS, FALSE, bufID);
 
 	char outputRow[50];
-	sprintf_s(outputRow, "som%d", atoi(argv[1])); 	//WE WILL FILL THIS FURTHER
+	sprintf_s(outputRow, "Process %d", atoi(argv[1]));
+
+
+	#elif __linux__
+	struct sigaction exitSignal;
+	exitSignal.sa_handler = exitProcess;
+	sigaction(SIGUSR1, &exitSignal, NULL);
+
+	struct sigaction printSignal;
+	printSignal.sa_handler = printLine;
+	sigaction(SIGUSR2, &printSignal, NULL);
+
+	char str[10];
+	sprintf(str, "Proc%d", atoi(argv));
+	#endif
+
 
 	for(ever) {
 
+		#ifdef _WIN32
 		if (WaitForSingleObject(print, 1) == WAIT_OBJECT_0) {
 
 			for (int i = 0; i < strlen(outputRow); i++) {
@@ -42,7 +90,6 @@ void Child::run(char* argv[])
 			SetEvent(stop);
 		}
 
-
 		if (WaitForSingleObject(close, 1) == WAIT_OBJECT_0) {
 			
 			CloseHandle(close);
@@ -50,5 +97,21 @@ void Child::run(char* argv[])
 			return;
 		}
 
+
+		#elif __linux__
+		usleep(10000);
+		if (Print) {
+			Print = false;
+			for(int i = 0; i < strlen(str); i++) {
+				napms(350);
+				printf("%c\n", str[i]);
+			}
+			kill(getppid(), SIGUSR1);
+		}
+		if (Close) {
+			exit(0);
+		}
+		#endif
 	}
 }
+
