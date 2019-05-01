@@ -76,7 +76,7 @@ void Parent::run()
 		}
 
 		if (!procInfo.empty())
-			WaitForSingleObject(stopEventInfo[currEvent], INFINITE);
+			WaitForSingleObject(stopEventInfo[currEvent - 1], INFINITE);
 
 		if (_kbhit()) {
 			choice = _getch();
@@ -85,7 +85,7 @@ void Parent::run()
 			}
 		
 			if (choice == '-' && !procInfo.empty()) {
-				if (printEventInfo.back() == printEventInfo[currEvent]) {
+				if (printEventInfo.back() == printEventInfo[currEvent - 1]) {
 					currEvent = 0;
 				}
 				eventID--;

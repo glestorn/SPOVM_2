@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <conio.h>
 #include <time.h>
+#include <string.h>
 
 #elif __linux__
 #include <unistd.h>
@@ -49,17 +50,17 @@ void Child::run(char* argv)
 	#ifdef _WIN32
 	char bufID[10];
 
-	sprintf_s(bufID, "%dprint", atoi(argv[1]));
+	sprintf_s(bufID, "%dprint", atoi(argv));
 	HANDLE print = OpenEvent(EVENT_ALL_ACCESS, FALSE, bufID);
 
-	sprintf_s(bufID, "%dclose", atoi(argv[1]));
+	sprintf_s(bufID, "%dclose", atoi(argv));
 	HANDLE close = OpenEvent(EVENT_ALL_ACCESS, FALSE, bufID);
 
-	sprintf_s(bufID, "%dstop", atoi(argv[1]));
+	sprintf_s(bufID, "%dstop", atoi(argv));
 	HANDLE stop = OpenEvent(EVENT_ALL_ACCESS, FALSE, bufID);
 
 	char outputRow[50];
-	sprintf_s(outputRow, "Process %d", atoi(argv[1]));
+	sprintf_s(outputRow, "Process %d", atoi(argv));
 
 
 	#elif __linux__
@@ -81,7 +82,7 @@ void Child::run(char* argv)
 		#ifdef _WIN32
 		if (WaitForSingleObject(print, 1) == WAIT_OBJECT_0) {
 
-			for (int i = 0; i < strlen(outputRow); i++) {
+			for (unsigned int i = 0; i < strlen(outputRow); i++) {
 				printf("%c", outputRow[i]);
 				Sleep(75);
 			}

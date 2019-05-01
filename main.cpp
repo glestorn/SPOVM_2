@@ -1,4 +1,3 @@
-//#include <string>
 #include<iostream>
 
 #include "Parent.h"
@@ -13,7 +12,7 @@ int main(int argc, char* argv[])
         else {
 #ifdef __linux__
             Child request(argv[0], argv[1]);
-#elif   _WIN32 | _WIN64
+#elif   _WIN32
 			Child request(argv[1]);
 #endif
         }
